@@ -1,0 +1,25 @@
+# Compilación
+build/
+cmake-build-*/
+*.o
+*.obj
+*.exe
+monte_carlo
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Los resultados se versionan solo cuando son finales
+results/*.png
