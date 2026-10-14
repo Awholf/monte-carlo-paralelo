@@ -1,7 +1,4 @@
-// monte_carlo.cpp — Monte Carlo SECUENCIAL
-// Responsable: Leonardo
-// NOTA: versión PROVISIONAL creada por Kiltom solo para poder compilar e
-// integrar. Leonardo reemplaza este archivo respetando la firma de simulacion.h.
+// NOTA: versión PROVISIONAL 
 #include <algorithm>
 #include <chrono>
 #include <cmath>

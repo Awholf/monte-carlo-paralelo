@@ -1,6 +1,4 @@
-// black_scholes.cpp — Fórmula analítica de Black-Scholes
-// Responsable: Leonardo
-// NOTA: versión PROVISIONAL creada por Kiltom para poder integrar.
+// NOTA: versión PROVISIONAL 
 #include <cmath>
 
 #include "simulacion.h"

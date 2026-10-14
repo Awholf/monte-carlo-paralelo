@@ -1,7 +1,4 @@
-// monte_carlo_omp.cpp — Monte Carlo PARALELO con OpenMP
-// Responsable: Jonathan
-// NOTA: versión PROVISIONAL creada por Kiltom para poder integrar.
-// Jonathan reemplaza este archivo respetando la firma de simulacion.h.
+// NOTA: versión PROVISIONAL 
 #include <omp.h>
 
 #include <algorithm>

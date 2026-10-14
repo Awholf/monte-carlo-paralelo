@@ -1,5 +1,5 @@
 // parametros.h — Estructuras compartidas entre módulos
-// Responsable: Kiltom
+
 #ifndef PARAMETROS_H
 #define PARAMETROS_H
 
