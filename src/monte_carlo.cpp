@@ -1,39 +1,61 @@
-// NOTA: versión PROVISIONAL 
-#include <algorithm>
-#include <chrono>
-#include <cmath>
+#include "../include/simulacion.h"
 #include <random>
+#include <cmath>
+#include <algorithm>
+#include <chrono> // Necesario para medir el tiempo_ms
 
-#include "simulacion.h"
+using namespace std;
+using namespace std::chrono;
 
-ResultadoSimulacion monte_carlo_secuencial(const ParametrosOpcion& p,
-                                           const ConfigSimulacion& cfg) {
-    auto inicio = std::chrono::high_resolution_clock::now();
+ResultadoSimulacion monte_carlo_secuencial(const ParametrosOpcion& p, const ConfigSimulacion& cfg) {
+    // 1. Iniciar el cronómetro
+    auto inicio = high_resolution_clock::now();
 
-    std::mt19937_64 gen(cfg.semilla);
-    std::normal_distribution<double> normal(0.0, 1.0);
+    // 2. Configurar el generador usando la semilla compartida
+    mt19937_64 gen(cfg.semilla);
+    normal_distribution<> d(0.0, 1.0);
 
-    const double drift = (p.r - 0.5 * p.sigma * p.sigma) * p.T;
-    const double vol = p.sigma * std::sqrt(p.T);
-    double suma = 0.0, suma2 = 0.0;
+    double suma_payoffs = 0.0;
+    double suma_payoffs_cuadrados = 0.0; // Necesario para el error estándar
 
+    // 3. Bucle de simulación (usando long long como en ConfigSimulacion)
     for (long long i = 0; i < cfg.num_simulaciones; ++i) {
-        double ST = p.S0 * std::exp(drift + vol * normal(gen));
-        double payoff = (p.tipo == TipoOpcion::CALL) ? std::max(ST - p.K, 0.0)
-                                                     : std::max(p.K - ST, 0.0);
-        suma += payoff;
-        suma2 += payoff * payoff;
+        double z = d(gen);
+        
+        // Calcular S_T (Precio en el vencimiento)
+        double S_T = p.S0 * exp((p.r - 0.5 * p.sigma * p.sigma) * p.T + p.sigma * sqrt(p.T) * z);
+        
+        // Calcular el payoff dependiendo de si es CALL o PUT
+        double payoff = 0.0;
+        if (p.tipo == TipoOpcion::CALL) {
+            payoff = max(S_T - p.K, 0.0);
+        } else {
+            payoff = max(p.K - S_T, 0.0);
+        }
+        
+        suma_payoffs += payoff;
+        suma_payoffs_cuadrados += payoff * payoff;
     }
 
-    const double n = static_cast<double>(cfg.num_simulaciones);
-    const double desc = std::exp(-p.r * p.T);
-    const double media = suma / n;
-    const double var = std::max(suma2 / n - media * media, 0.0);
+    // 4. Calcular el precio estimado
+    double precio_promedio = suma_payoffs / cfg.num_simulaciones;
+    double factor_descuento = exp(-p.r * p.T);
+    double precio_estimado = precio_promedio * factor_descuento;
 
-    ResultadoSimulacion res;
-    res.precio = desc * media;
-    res.error_std = desc * std::sqrt(var / n);
-    res.tiempo_ms = std::chrono::duration<double, std::milli>(
-        std::chrono::high_resolution_clock::now() - inicio).count();
-    return res;
+    // 5. Calcular el error estándar
+    double varianza = (cfg.num_simulaciones < 2) ? 0.0 : (suma_payoffs_cuadrados - (suma_payoffs * suma_payoffs) / cfg.num_simulaciones) / (cfg.num_simulaciones - 1.0);
+    double error_estandar = sqrt(varianza) * factor_descuento / sqrt(cfg.num_simulaciones);
+
+    // 6. Detener el cronómetro y calcular el tiempo en milisegundos
+    auto fin = high_resolution_clock::now();
+    double tiempo_ms = duration<double, milli>(fin - inicio).count();
+
+
+    // 7. Llenar el resultado estructurado
+    ResultadoSimulacion resultado;
+    resultado.precio = precio_estimado;
+    resultado.error_std = error_estandar;
+    resultado.tiempo_ms = tiempo_ms;
+
+    return resultado;
 }
