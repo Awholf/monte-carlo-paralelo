@@ -2,7 +2,6 @@
 #include <random>
 #include <cmath>
 #include <algorithm>
-#include <stdio.h>
 #include <chrono> // Necesario para medir el tiempo_ms
 
 using namespace std;
@@ -13,7 +12,7 @@ ResultadoSimulacion monte_carlo_secuencial(const ParametrosOpcion& p, const Conf
     auto inicio = high_resolution_clock::now();
 
     // 2. Configurar el generador usando la semilla compartida
-    mt19937 gen(cfg.semilla); 
+    mt19937_64 gen(cfg.semilla);
     normal_distribution<> d(0.0, 1.0);
 
     double suma_payoffs = 0.0;
@@ -44,14 +43,13 @@ ResultadoSimulacion monte_carlo_secuencial(const ParametrosOpcion& p, const Conf
     double precio_estimado = precio_promedio * factor_descuento;
 
     // 5. Calcular el error estándar
-    double varianza = (suma_payoffs_cuadrados - (suma_payoffs * suma_payoffs) / cfg.num_simulaciones) / (cfg.num_simulaciones - 1.0);
+    double varianza = (cfg.num_simulaciones < 2) ? 0.0 : (suma_payoffs_cuadrados - (suma_payoffs * suma_payoffs) / cfg.num_simulaciones) / (cfg.num_simulaciones - 1.0);
     double error_estandar = sqrt(varianza) * factor_descuento / sqrt(cfg.num_simulaciones);
 
     // 6. Detener el cronómetro y calcular el tiempo en milisegundos
     auto fin = high_resolution_clock::now();
     double tiempo_ms = duration<double, milli>(fin - inicio).count();
 
-    printf("Secuencial -> Precio: %f | Error: %f | Tiempo: %.2f ms\n", precio_estimado, error_estandar, tiempo_ms);
 
     // 7. Llenar el resultado estructurado
     ResultadoSimulacion resultado;
