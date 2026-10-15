@@ -195,8 +195,8 @@ int main(int argc, char** argv) {
         if (argc > 1) return ejecutar_por_argumentos(argc, argv);
 
         std::cout << "==========================================\n"
-                  << " Simulación Monte Carlo - Opción Europea\n"
-                  << " Programación Concurrente y Paralela - Eq. 9\n"
+                  << " Simulacion Monte Carlo - Opcion Europea\n"
+                  << " Programacion Concurrente y Paralela\n"
                   << "==========================================\n";
         ParametrosOpcion p;
         ConfigSimulacion c;
@@ -204,7 +204,7 @@ int main(int argc, char** argv) {
             pedir_datos(p, c);
             validar(p, c);
             mostrar_resultados(p, c);
-            int otra = leer_opcion("\n¿Otra simulación? (1 = Sí, 0 = Salir)", 0, 1, 0);
+            int otra = leer_opcion("\n¿Otra simulacion? (1 = Si, 0 = Salir)", 0, 1, 0);
             if (otra == 0) break;
         }
     } catch (const std::exception& e) {
